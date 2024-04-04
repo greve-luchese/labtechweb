@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Cards</title>
+    <style>
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            filter: blur(10px);
+            transition: filter 0.5s ease-in-out;
+        }
+
+        .music-card {
+            position: relative;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 600px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div class="background" id="background"></div>
+        <div class="container mt-2 px-2">
+            <div class="row mt-2">
+                <div class="col-lg-8 col-md-6 col-sm-12">
+                    <header>
+                        <h1 class="display-4 text-center">Music Cards</h1>
+                    </header>
+                    <div id="musicCards">
+                        <!-- Music cards will be dynamically added here -->
+                    </div>
+                    <div class="text-center">
+                        <button id="prevButton" class="btn btn-primary me-2">&laquo; Previous</button>
+                        <button id="nextButton" class="btn btn-primary">Next &raquo;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        const musicData = [
+            {
+                title: 'Gangnam Style',
+                artist: 'Psy',
+                imageUrl: 'psy.gif',
+                audioUrl: 'gangnam_style.mp3',
+                description: 'Park Jae-sang, known professionally as Psy, is a South Korean singer and rapper. Psy is known domestically for his humorous videos and stage performances, and internationally for his hit single "Gangnam Style".',
+            },
+            {
+                title: 'This Charming Man',
+                artist: 'The Smiths',
+                imageUrl: 'morrissey-the-smiths.gif',
+                audioUrl: 'this charming man.mp3',
+                description: "This Charming Man is a song by the English rock band the Smiths, written by guitarist Johnny Marr and singer Morrissey. Released as the group's second single in October 1983 on the independent record label Rough Trade, it is defined by Marr's jangle pop guitar riff and Morrissey's characteristically morose lyrics, which revolve around the recurrent Smiths themes of sexual ambiguity and lust. A different version, from the John Peel Show on BBC Radio 1, was included on the compilation album Hatful of Hollow in 1984.",
+            },
+            {
+                title: 'SFRATTO',
+                artist: 'Unibo Mixtapers',
+                imageUrl: 'sfrattato.jpg',
+                audioUrl: 'SFRATTO.mp3',
+                description: "Snippet dell'unibo mixtape vol2 con: Rugjoint, Tommyjeans, Fresco, Simonelofattone e G luca. Questa canzone parla dello sfratto di G luca a parte dei brothers ma in realtà è uno sneak diss a qualcuno.",
+            }
+        ];
+
+        let currentCardIndex = 0;
+        const musicCardsContainer = document.getElementById('musicCards');
+        const background = document.getElementById('background');
+
+        function createMusicCard(cardData) {
+            const cardHtml = `
+                <div class="music-card">
+                    <img src="${cardData.imageUrl}" class="img-fluid rounded-start" alt="${cardData.title}">
+                    <h5 class="card-title">${cardData.title}</h5>
+                    <p class="card-text">${cardData.description}</p>
+                    <audio id="musicPlayer${currentCardIndex}" src="${cardData.audioUrl}" hidden></audio>
+                    <button class="btn btn-primary play-button" data-index="${currentCardIndex}">
+                        <i class="bi bi-play-circle-fill"></i> Play
+                    </button>
+                </div>
+            `;
+            const cardElement = document.createElement('div');
+            cardElement.innerHTML = cardHtml;
+            return cardElement;
+        }
+
+        function loadMusicCards() {
+            musicCardsContainer.innerHTML = '';
+            const card = createMusicCard(musicData[currentCardIndex]);
+            musicCardsContainer.appendChild(card);
+            const playButton = card.querySelector('.play-button');
+            playButton.addEventListener('click', () => togglePlayPause(currentCardIndex));
+            // Change background dynamically based on the song
+            background.style.backgroundImage = `url(${musicData[currentCardIndex].imageUrl})`;
+        }
+
+        function togglePlayPause(index) {
+            const audio = document.getElementById(`musicPlayer${index}`);
+            const playButton = musicCardsContainer.querySelector(`[data-index="${index}"]`);
+            if (audio.paused) {
+                audio.play();
+                playButton.innerHTML = '<i class="bi bi-pause-circle-fill"></i> Pause';
+            } else {
+                audio.pause();
+                playButton.innerHTML = '<i class="bi bi-play-circle-fill"></i> Play';
+            }
+        }
+
+        document.getElementById('prevButton').addEventListener('click', () => {
+            currentCardIndex = (currentCardIndex - 1 + musicData.length) % musicData.length;
+            loadMusicCards();
+        });
+
+        document.getElementById('nextButton').addEventListener('click', () => {
+            currentCardIndex = (currentCardIndex + 1) % musicData.length;
+            loadMusicCards();
+        });
+
+        loadMusicCards(); // Load the initial card
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

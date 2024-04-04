@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomodoro Study Timer</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    background: #2b2e45;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .dot-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .dot {
+    width: 30px;
+    height: 30px;
+    background: rgba(176, 255, 95, 1);
+    border-radius: 1000%;
+    box-shadow: 0 0 20px rgba(176, 255, 95, 1),
+                0 0 40px rgba(176, 255, 95, 1),
+                0 0 60px rgba(176, 255, 95, 1),
+                0 0 80px rgba(176, 255, 95, 1);
+    transition: box-shadow 1s ease-out; 
+  }
+
+  #studyForm {
+    position: absolute;
+    top: 20px; /* Ensure the form appears above the blob */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    background: #ccc; /* Grey background color */
+    padding: 10px;
+    border-radius: 5px;
+    font-family: 'Courier New', sans-serif; /* Change font */
+    font-size: 16px; /* Adjust font size */
+  }
+
+  #studyForm input[type="number"], 
+  #studyForm button {
+    font-family: 'Arial', sans-serif; /* Change font */
+    font-size: 16px; /* Adjust font size */
+  }
+
+  #clock {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .timer {
+    font-size: 2em;
+    z-index: 1;
+    color: black;
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 20px rgba(176, 255, 95, 1),
+                  0 0 40px rgba(176, 255, 95, 1),
+                  0 0 60px rgba(176, 255, 95, 1),
+                  0 0 80px rgba(176, 255, 95, 1);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(255, 255, 255, 1), /* Brighter shade */
+                  0 0 60px rgba(255, 255, 255, 1), /* Brighter shade */
+                  0 0 90px rgba(255, 255, 255, 1), /* Brighter shade */
+                  0 0 120px rgba(255, 255, 255, 1); /* Brighter shade */
+    }
+    100% {
+      box-shadow: 0 0 20px rgba(176, 255, 95, 1),
+                  0 0 40px rgba(176, 255, 95, 1),
+                  0 0 60px rgba(176, 255, 95, 1),
+                  0 0 80px rgba(176, 255, 95, 1);
+    }
+  }
+</style>
+</head>
+<body>
+
+<form id="studyForm">
+  <label for="studyTime">Enter study time in minutes:</label>
+  <input type="number" id="studyTime" name="studyTime" min="1" required>
+  <button type="submit">Start Studying</button>
+</form>
+
+<div class="dot-container">
+  <div class="dot"></div>
+</div>
+
+<div id="clock" class="blob">
+  <div class="timer" id="timerDisplay">00:00</div>
+</div>
+
+<script>
+document.getElementById('studyForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const studyTime = parseInt(document.getElementById('studyTime').value);
+  const pulseDuration = Math.min(studyTime * 60000, 5000); // Ensure pulse duration doesn't exceed 5 seconds
+  const endTime = Date.now() + studyTime * 60000;
+
+  const interval = setInterval(function() {
+    const now = Date.now();
+    const difference = endTime - now;
+
+    if (difference <= 0) {
+      clearInterval(interval);
+      document.getElementById('timerDisplay').textContent = "00:00";
+
+      var dot = document.querySelector(".dot");
+      dot.style.boxShadow = "0 0 0 30px rgba(176, 255, 95, 1), " +
+                            "0 0 0 60px rgba(176, 255, 95, 1), " +
+                            "0 0 0 120px rgba(176, 255, 95, 1), " +
+                            "0 0 0 240px rgba(176, 255, 95, 1), " +
+                            "0 0 0 480px rgba(176, 255, 95, 1), " +
+                            "0 0 0 960px rgba(176, 255, 95, 1)";
+
+      setTimeout(() => {
+        // Revert back to normal
+        dot.style.transition = "box-shadow 1s ease-out";
+        dot.style.boxShadow = "";
+      }, 1000); // Add a delay before reverting
+
+      return;
+    }
+
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+    document.getElementById('timerDisplay').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
+    // Start the pulse animation
+    if (difference > pulseDuration) {
+      var dot = document.querySelector(".dot");
+      dot.style.animation = "pulse 2s infinite";
+    } else {
+      var dot = document.querySelector(".dot");
+      dot.style.animation = "none";
+    }
+  }, 1000);
+});
+
+</script>
+
+</body>
+</html>
